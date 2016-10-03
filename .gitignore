@@ -1,0 +1,6 @@
+*.pyc
+DS_Store
+logfile
+*.sqplite3
+media/
+venv/
