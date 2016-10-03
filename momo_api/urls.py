@@ -5,12 +5,15 @@ from django.contrib import admin
 
 from rest_framework.routers import DefaultRouter
 
+from momo_api.account.views import CompanyViewSet, UserViewSet
+
 
 # Django REST framework API routing
 router = DefaultRouter()
 
 # API endpoints
-# router.register(r'user-profiles', UserProfileViewSet)
+router.register(r'users', UserViewSet)
+router.register(r'companies', CompanyViewSet)
 
 # Construct URLs
 urlpatterns = [
