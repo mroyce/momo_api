@@ -98,7 +98,7 @@ class Command(BaseCommand):
         for user in UserProfile.objects.all():
             print ' * User {}:'.format(user.id)
             print '     - username: {}'.format(user.account.username)
-            print '     - name: {} {}'.format(user.first_name, user.last_name)
+            print '     - name: {}'.format(user.full_name)
 
         print '------------------ Companies ------------------'
         print 'There are {} test companies:'.format(CompanyProfile.objects.count())

@@ -32,6 +32,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
 
         fields = (
+            'id',
             'account',
             'first_name',
             'last_name',
@@ -49,6 +50,7 @@ class CompanyProfileSerializer(serializers.ModelSerializer):
         model = CompanyProfile
 
     	fields = (
+            'id',
             'account',
             'name',
             'email',

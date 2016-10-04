@@ -109,6 +109,10 @@ class Account(AbstractBaseUser):
         # self.save()
         return self
 
+    @property
+    def full_name(self):
+        return '{} {}'.format(self.first_name, self.last_name)
+
 
 class ProfileBase(models.Model):
     account_generic_relation = GenericRelation(Account, content_type_field='profile_content_type', object_id_field='profile_id')
