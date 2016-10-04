@@ -23,7 +23,18 @@ class AccountManager(BaseUserManager):
             **kwargs
         )
 
+        # set password
         account.set_password(password)
+
+        # create a profile for this account
+        profile = {
+            Account.USER: UserProfile(),
+            Account.COMPANY: CompanyProfile(),
+        }.get(account.account_type, Account.USER)
+        profile.save()
+
+        account.profile_content_type = ContentType.objects.get_for_model(profile)
+        account.profile_id = profile.id
         account.save()
 
         return account
@@ -36,6 +47,7 @@ class AccountManager(BaseUserManager):
             **kwargs
         )
 
+        # set account as admin
         account.is_admin = True
         account.save()
 
@@ -76,7 +88,7 @@ class Account(AbstractBaseUser):
 
     def get_short_name(self):
         """
-        Return informal identifier for the user
+        Return informal identifier for the account
         https://docs.djangoproject.com/en/dev/topics/auth/customizing/#djangexio.contrib.auth.models.CustomUser.get_short_name
         """
         return self.username
@@ -98,9 +110,15 @@ class Account(AbstractBaseUser):
         return self
 
 
-class GetAccountMixin(object):
+class ProfileBase(models.Model):
+    account = GenericRelation(Account, content_type_field='profile_content_type', object_id_field='profile_id')
+
     @property
     def get_account(self):
+        """
+        Get the account associated with this profile.
+        Copied from http://stackoverflow.com/questions/7837330/generic-one-to-one-relation-in-django
+        """
         ctype = ContentType.objects.get_for_model(self.__class__)
         try:
             account = Account.objects.get(profile_content_type__pk=ctype.id, profile_id=self.id)
@@ -108,23 +126,12 @@ class GetAccountMixin(object):
             return None
         return account
 
-
-class ProfileBase(GetAccountMixin, models.Model):
-    account = GenericRelation(Account, content_type_field='profile_content_type', object_id_field='profile_id')
-
     class Meta:
         abstract = True
 
 
 class UserProfileManager(models.Manager):
-    def create(self, username, password, *args, **kwargs):
-        user_profile = self.model(*args, **kwargs)
-
-        account = Account.objects.create_user(username=username, password=password)
-        account.profile = user_profile
-        account.save()
-
-        return super(UserProfileManager, self).create(*args, **kwargs)
+    pass
 
 
 class UserProfile(ProfileBase):
@@ -148,14 +155,7 @@ class UserProfile(ProfileBase):
 
 
 class CompanyProfileManager(models.Manager):
-    def create(self, username, password, *args, **kwargs):
-        company_profile = self.model(*args, **kwargs)
-
-        account = Account.objects.create_user(username=username, password=password)
-        account.profile = company_profile
-        account.save()
-
-        return super(CompanyProfileManager, self).create(*args, **kwargs)
+    pass
 
 
 class CompanyProfile(ProfileBase):

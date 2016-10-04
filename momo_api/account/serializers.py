@@ -12,7 +12,7 @@ class AccountSerializer(serializers.ModelSerializer):
             'username',
             'password',
             'account_type',
-            'is_active',
+            # 'is_active',
         )
 
         extra_kwargs = {
@@ -21,7 +21,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
         read_only_fields = (
             'account_type',
-            'is_active',
+            # 'is_active',
         )
 
 
