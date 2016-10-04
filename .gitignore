@@ -4,3 +4,4 @@ logfile
 *.sqlite3
 media/
 venv/
+*.swp
