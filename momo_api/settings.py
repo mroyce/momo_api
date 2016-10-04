@@ -28,7 +28,7 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', ['localhost'])
 
 # Authentication Model
 # https://docs.djangoproject.com/en/1.10/topics/auth/customizing/#auth-custom-user
-# AUTH_USER_MODEL = 'account.Account'
+AUTH_USER_MODEL = 'account.Account'
 
 
 # Application definition
@@ -49,6 +49,8 @@ INSTALLED_APPS = [
 
     'momo_api',
     'momo_api.account',
+    'momo_api.base',
+    'momo_api.listing',
 ]
 
 

@@ -1,18 +1,18 @@
 from rest_framework import viewsets
 
-from .models import Company, User
-from .serializers import CompanySerializer, UserSerializer
+from .models import CompanyProfile, UserProfile
+from .serializers import CompanyProfileSerializer, UserProfileSerializer
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.filter(is_active=True)
-    serializer_class = UserSerializer
+class UserProfileViewSet(viewsets.ModelViewSet):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
     permission_classes = ()
     filter_fields = ()
 
 
-class CompanyViewSet(viewsets.ModelViewSet):
-    queryset = Company.objects.filter(is_active=True)
-    serializer_class = CompanySerializer
+class CompanyProfileViewSet(viewsets.ModelViewSet):
+    queryset = CompanyProfile.objects.all()
+    serializer_class = CompanyProfileSerializer
     permission_classes = ()
     filter_fields = ()

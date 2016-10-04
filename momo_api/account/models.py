@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.validators import RegexValidator
 from django.db import models
@@ -14,63 +16,52 @@ def _generate_jwt_secret_key():
 
 
 class AccountManager(BaseUserManager):
-    """
-    Account Manager
-    Extends django.contrib.auth.models.BaseUserManager
-    """
     def create_user(self, username, password=None, *args, **kwargs):
-        """
-	Create a new Account
-	Also assign the user an auth_token
-	https://docs.djangoproject.com/en/dev/topics/auth/customizing/#django.contrib.auth.models.CustomUserManager.create_user
-	"""
-	account = self.model(
-	    username=username,
-	    *args,
-	    **kwargs
-	)
+        account = self.model(
+            username=username,
+            *args,
+            **kwargs
+        )
 
-	account.save()
-	account.set_password(password)
-	account.save()
-	return account
+        account.set_password(password)
+        account.save()
+
+        return account
 
     def create_superuser(self, username, password, *args, **kwargs):
         account = self.create_user(
             username,
-	    password=password,
-	    *args,
-	    **kwargs
-	)
+            password=password,
+            *args,
+            **kwargs
+        )
 
-	account.is_admin = True
-	account.save()
-	return account
+        account.is_admin = True
+        account.save()
+
+        return account
 
 
 class Account(AbstractBaseUser):
-    """
-    Account Model
-    Extends django.contrib.auth.models.AbstractBaseUser
-    https://docs.djangoproject.com/en/1.10/topics/auth/customizing/#django.contrib.auth.models.AbstractBaseUser
-    """
     username = models.CharField(unique=True, max_length=20)
     jwt_secret_key = models.CharField(default=_generate_jwt_secret_key, max_length=30, editable=False)
-    is_active = models.BooleanField(default=True)
 
     USER = 1
     COMPANY = 2
     ACCOUNT_TYPE_CHOICES = (
         (USER, 'User'),
-	(COMPANY, 'Company'),
+        (COMPANY, 'Company'),
     )
     account_type = models.PositiveSmallIntegerField(choices=ACCOUNT_TYPE_CHOICES, default=USER)
+    profile_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, blank=True, null=True)
+    profile_id = models.PositiveIntegerField(blank=True, null=True)
+    profile = GenericForeignKey('profile_content_type', 'profile_id')
 
     objects = AccountManager()
 
-    # This is required to make email field the default identifier
+    # This is required to make 'username' field the default identifier
     # https://docs.djangoproject.com/en/dev/topics/auth/customizing/#django.contrib.auth.models.CustomUser.USERNAME_FIELD
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'username'
 
     # This is required for when creating a user via the createsuperuser management command
     # https://docs.djangoproject.com/en/dev/topics/auth/customizing/#django.contrib.auth.models.CustomUser.REQUIRED_FIELDS
@@ -90,13 +81,6 @@ class Account(AbstractBaseUser):
         """
         return self.username
 
-#    def is_active(self):
-#        """
-#        Return whether the user is considered active
-#        https://docs.djangoproject.com/en/dev/topics/auth/customizing/#django.contrib.auth.models.CustomUser.is_active
-#        """
-#        return self.is_active
-
     def get_jwt_secret_key(self):
         """
         Sign JWTs with a combination of settings.JWT_MASTER_SECRET_KEY
@@ -109,25 +93,41 @@ class Account(AbstractBaseUser):
         Don't delete the Account
         Instead just set `is_active` to False
         """
-        self.is_active = False
-        self.save()
+        # self.is_active = False
+        # self.save()
         return self
+
+
+class GetAccountMixin(object):
+    @property
+    def get_account(self):
+        ctype = ContentType.objects.get_for_model(self.__class__)
+        try:
+            account = Account.objects.get(profile_content_type__pk=ctype.id, profile_id=self.id)
+        except:
+            return None
+        return account
+
+
+class ProfileBase(GetAccountMixin, models.Model):
+    account = GenericRelation(Account, content_type_field='profile_content_type', object_id_field='profile_id')
 
     class Meta:
         abstract = True
 
 
-class UserManager(AccountManager):
-    """
-    User Manager
-    """
-    pass
+class UserProfileManager(models.Manager):
+    def create(self, username, password, *args, **kwargs):
+        user_profile = self.model(*args, **kwargs)
+
+        account = Account.objects.create_user(username=username, password=password)
+        account.profile = user_profile
+        account.save()
+
+        return super(UserProfileManager, self).create(*args, **kwargs)
 
 
-class User(Account):
-    """
-    User Model
-    """
+class UserProfile(ProfileBase):
     first_name = models.CharField(max_length=255, blank=True, null=True)
     last_name = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(unique=True, blank=True, null=True)
@@ -137,27 +137,28 @@ class User(Account):
     FEMALE = 'F'
     GENDER_CHOICES = (
         (MALE, 'Male'),
-	(FEMALE, 'Female'),
+        (FEMALE, 'Female'),
     )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'.")
     phone_number = models.CharField(validators=[phone_regex], max_length=15, blank=True, null=True)
 
-    objects = UserManager()
+    objects = UserProfileManager()
 
 
-class CompanyManager(AccountManager):
-    """
-    Company Manager
-    """
-    pass
+class CompanyProfileManager(models.Manager):
+    def create(self, username, password, *args, **kwargs):
+        company_profile = self.model(*args, **kwargs)
+
+        account = Account.objects.create_user(username=username, password=password)
+        account.profile = company_profile
+        account.save()
+
+        return super(CompanyProfileManager, self).create(*args, **kwargs)
 
 
-class Company(Account):
-    """
-    Company Model
-    """
+class CompanyProfile(ProfileBase):
     name = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(unique=True, blank=True, null=True)
     avatar = models.ImageField(max_length=256, blank=True, null=True)
@@ -165,5 +166,5 @@ class Company(Account):
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'.")
     phone_number = models.CharField(validators=[phone_regex], max_length=15, blank=True, null=True)
 
-    objects = CompanyManager()
+    objects = CompanyProfileManager()
 
