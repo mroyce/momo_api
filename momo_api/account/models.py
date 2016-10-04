@@ -65,8 +65,8 @@ class Account(AbstractBaseUser):
         (COMPANY, 'Company'),
     )
     account_type = models.PositiveSmallIntegerField(choices=ACCOUNT_TYPE_CHOICES, default=USER)
-    profile_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, blank=True, null=True)
-    profile_id = models.PositiveIntegerField(blank=True, null=True)
+    profile_content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, blank=True)
+    profile_id = models.PositiveIntegerField(blank=True)
     profile = GenericForeignKey('profile_content_type', 'profile_id')
 
     objects = AccountManager()
@@ -111,10 +111,10 @@ class Account(AbstractBaseUser):
 
 
 class ProfileBase(models.Model):
-    account = GenericRelation(Account, content_type_field='profile_content_type', object_id_field='profile_id')
+    account_generic_relation = GenericRelation(Account, content_type_field='profile_content_type', object_id_field='profile_id')
 
     @property
-    def get_account(self):
+    def account(self):
         """
         Get the account associated with this profile.
         Copied from http://stackoverflow.com/questions/7837330/generic-one-to-one-relation-in-django

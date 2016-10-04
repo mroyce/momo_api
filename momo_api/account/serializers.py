@@ -26,13 +26,13 @@ class AccountSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    # account = AccountSerializer()
+    account = AccountSerializer()
 
     class Meta:
         model = UserProfile
 
         fields = (
-            # 'account',
+            'account',
             'first_name',
             'last_name',
             'email',
@@ -43,13 +43,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class CompanyProfileSerializer(serializers.ModelSerializer):
-    # account = AccountSerializer()
+    account = AccountSerializer()
 
     class Meta:
         model = CompanyProfile
 
     	fields = (
-            # 'account',
+            'account',
             'name',
             'email',
             'avatar',
