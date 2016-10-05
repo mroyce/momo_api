@@ -6,6 +6,8 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.crypto import get_random_string
 
+from momo_api.base.models import ActiveModelMixin
+
 
 def _generate_jwt_secret_key():
     """
@@ -54,7 +56,7 @@ class AccountManager(BaseUserManager):
         return account
 
 
-class Account(AbstractBaseUser):
+class Account(AbstractBaseUser, ActiveModelMixin):
     username = models.CharField(unique=True, max_length=20)
     jwt_secret_key = models.CharField(default=_generate_jwt_secret_key, max_length=30, editable=False)
 
@@ -109,10 +111,6 @@ class Account(AbstractBaseUser):
         # self.save()
         return self
 
-    @property
-    def full_name(self):
-        return '{} {}'.format(self.first_name, self.last_name)
-
 
 class ProfileBase(models.Model):
     account_generic_relation = GenericRelation(Account, content_type_field='profile_content_type', object_id_field='profile_id')
@@ -156,6 +154,10 @@ class UserProfile(ProfileBase):
     phone_number = models.CharField(validators=[phone_regex], max_length=15, blank=True, null=True)
 
     objects = UserProfileManager()
+
+    @property
+    def full_name(self):
+        return '{} {}'.format(self.first_name, self.last_name)
 
 
 class CompanyProfileManager(models.Manager):
