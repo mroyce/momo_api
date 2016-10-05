@@ -6,14 +6,20 @@ from django.contrib import admin
 from rest_framework.routers import DefaultRouter
 
 from momo_api.account.views import CompanyProfileViewSet, UserProfileViewSet
+from momo_api.listing.views import EventViewSet, ListingViewSet
 
 
 # Django REST framework API routing
 router = DefaultRouter()
 
 # API endpoints
+# account
 router.register(r'users', UserProfileViewSet)
 router.register(r'companies', CompanyProfileViewSet)
+
+# listing
+router.register(r'events', EventViewSet)
+router.register(r'listings', ListingViewSet)
 
 # Construct URLs
 urlpatterns = [
@@ -29,10 +35,10 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += [
         # REST framework browsable API login/logout views
-	url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+        url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
-	# API documentation
-	# url(r'^api-docs/', include('rest_framework_swagger.urls')),
+        # API documentation
+        # url(r'^api-docs/', include('rest_framework_swagger.urls')),
     ]
 
     # Media files URL
