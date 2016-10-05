@@ -6,6 +6,7 @@ from django.contrib import admin
 from rest_framework.routers import DefaultRouter
 
 from momo_api.account.views import CompanyProfileViewSet, UserProfileViewSet
+from momo_api.base.auth.jwt import JWTLoginView, JWTSignUpView
 from momo_api.listing.views import EventViewSet, ListingViewSet
 
 
@@ -28,6 +29,10 @@ urlpatterns = [
 
     # Django admin views
     url(r'^api-admin/', admin.site.urls),
+
+    # API Authentication
+    url(r'^api/auth/sign-up/', JWTSignUpView.as_view(), name='sign-up'),
+    url(r'^api/auth/login/', JWTLoginView.as_view(), name='login'),
 ]
 
 

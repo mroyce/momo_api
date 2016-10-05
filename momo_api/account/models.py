@@ -107,8 +107,8 @@ class Account(AbstractBaseUser, ActiveModelMixin):
         Don't delete the Account
         Instead just set `is_active` to False
         """
-        # self.is_active = False
-        # self.save()
+        self.is_active = False
+        self.save()
         return self
 
 
