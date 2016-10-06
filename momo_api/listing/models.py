@@ -4,7 +4,8 @@ from django.db import models
 from momo_api.base.models import TrackEditsModelMixin
 
 
-class Attraction(models.Model, TrackEditsModelMixin):
+# TODO: add in TrackEditsModelMixin
+class Attraction(models.Model):
     """
     Abstract class for describing Listings/Events.
     """
@@ -14,7 +15,6 @@ class Attraction(models.Model, TrackEditsModelMixin):
     short_description = models.CharField(max_length=255, blank=True, null=True)
     long_description = models.TextField(blank=True, null=True)
     thumbnail = models.ImageField(max_length=256, blank=True, null=True)
-    # location unique
 
     class Meta:
         abstract = True

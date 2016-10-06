@@ -16,8 +16,8 @@ class AttractionSerializer(serializers.ModelSerializer):
             'short_description',
             'long_description',
             'thumbnail',
-            'created_at',
-            'edited_at',
+            # 'created_at',
+            # 'edited_at',
         )
 
 
@@ -33,8 +33,8 @@ class ListingSerializer(serializers.ModelSerializer):
             'short_description',
             'long_description',
             'thumbnail',
-            'created_at',
-            'edited_at',
+            # 'created_at',
+            # 'edited_at',
         )
 
 
@@ -52,6 +52,6 @@ class EventSerializer(serializers.ModelSerializer):
             'long_description',
             'thumbnail',
             'time',
-            'created_at',
-            'edited_at',
+            # 'created_at',
+            # 'edited_at',
         )
