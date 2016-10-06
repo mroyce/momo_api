@@ -1,8 +1,10 @@
 from django.conf import settings
 from django.db import models
 
+from momo_api.base.models import TrackEditsModelMixin
 
-class Attraction(models.Model):
+
+class Attraction(models.Model, TrackEditsModelMixin):
     """
     Abstract class for describing Listings/Events.
     """
