@@ -23,7 +23,15 @@ SECRET_KEY = '5*mj(=w3ryh$x8-bulis%g0#*lonkvr1fo@j65gbu!-pm!d=0%'
 DEBUG = True
 
 
+# https://docs.djangoproject.com/en/1.10/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', ['localhost'])
+
+
+# https://github.com/ottoyiu/django-cors-headers
+CORS_ORIGIN_WHITELIST = (
+    'localhost:8080',
+    '127.0.0.1:8080',
+)
 
 
 # Authentication Model
@@ -88,7 +96,7 @@ DATABASES = {
 }
 
 
-# Template
+# Templates
 # Used by our browsable api
 # https://docs.djangoproject.com/en/1.10/topics/templates/
 TEMPLATES = [
@@ -110,7 +118,6 @@ TEMPLATES = [
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -178,7 +185,7 @@ DEFAULT_FILE_STORAGE = os.environ.get('DEFAULT_FILE_STORAGE', 'django.core.files
 # http://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'momo_api.core.auth.JWTAuthentication',
+        # 'momo_api.base.auth.jwt.JWTAuthentication',
     ),
 
     'DEFAULT_PERMISSION_CLASSES': (
