@@ -6,7 +6,8 @@ from django.contrib import admin
 from rest_framework.routers import DefaultRouter
 
 from momo_api.account.views import CompanyProfileViewSet, UserProfileViewSet
-from momo_api.base.auth.jwt import JWTLoginView, JWTSignUpView
+from momo_api.base.auth.jwt.jwt_login_view import JWTLoginView
+from momo_api.base.auth.jwt.jwt_signup_view import JWTSignUpView
 from momo_api.listing.views import EventViewSet, ListingViewSet
 
 
